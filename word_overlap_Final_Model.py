@@ -1,24 +1,32 @@
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, jaccard_score
-import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
+import os
 import json
-from sklearn.naive_bayes import GaussianNB
-from tqdm import tqdm
-from sklearn.metrics import confusion_matrix, classification_report
+import matplotlib
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('MacOSX')  # Use the MacOSX backend
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, jaccard_score, confusion_matrix, classification_report
+from sklearn.feature_extraction.text import CountVectorizer
+from tqdm import tqdm
 
+# Assuming the datasets directory is a sibling to the script location
+# and plots will be saved to a 'plots' directory also at the same level as the script
+datasets_dir = 'datasets'
+plots_dir = 'plots'
+
+# Use the MacOSX backend or adjust for a more generic backend compatible with all OS like 'Agg'
+matplotlib.use('MacOSX')  
+
+# Ensure plots directory exists 
+os.makedirs(plots_dir, exist_ok=True)
 
 # Load and process all the different datasets
 def load_and_process_dataset(file_path):
     if file_path is None:
         return None
-    with open(file_path, 'r') as f:
+    with open(os.path.join(datasets_dir, file_path), 'r') as f:
         data = json.load(f)
     return data
 
@@ -86,7 +94,8 @@ def plot_confusion_matrix(cm, dataset_name, dataset_type):
     plt.ylabel('Actual')
     plt.xlabel('Predicted')
     # Save the plot with dynamic filename
-    plt.savefig(f'/Users/isabellewurth/Documents/Lola/{dataset_name}.png')
+    # and save plot to the 'plots' directory
+    plt.savefig(os.path.join(plots_dir, f'{dataset_name}-{dataset_type}.png')) 
     # Display plot
     plt.show(block=True)
     
@@ -143,12 +152,14 @@ def jaccard_similarity(list1, list2):
 def main():
     # List of all the directories to the different data sets to load 
     datasets = [
-        ('/Users/isabellewurth/Documents/Lola/preprocessed_train_data.json', '/Users/isabellewurth/Documents/Lola/preprocessed_test_data.json', 'SNLI Data'),
-        ('/Users/isabellewurth/Documents/Lola/hans_data.json', '/Users/isabellewurth/Documents/Lola/hans_data.json', 'HANS Data'),
-        ('/Users/isabellewurth/Documents/Lola/mnli_train_data.json', '/Users/isabellewurth/Documents/Lola/mnli_test_data.json', 'MNLI Data'),
-        ('/Users/isabellewurth/Documents/Lola/sick_train_data.json', '/Users/isabellewurth/Documents/Lola/sick_test_data.json', 'SICK Data'),
-        ('/Users/isabellewurth/Documents/Lola/anli_train_data.json', '/Users/isabellewurth/Documents/Lola/anli_test_data.json', 'ANLI Data')
-        # Add other dataset paths
+        # Replace 'your_train_dataset.json' and 'your_test_dataset.json' with the actual file path of your JSON dataset
+        ('your_train_dataset.json', 'your_test_dataset.json', 'SNLI Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'HANS Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'MNLI Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'SICK Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'ANLI Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'WANLI Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'FNLI Data')
     ]
 
     # Loop over each dataset specified in the datasets list to load and process train 
