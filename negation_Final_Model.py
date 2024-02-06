@@ -1,17 +1,26 @@
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score#, jaccard_score
-import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
+import os
 import json
-from sklearn.naive_bayes import GaussianNB
-from tqdm import tqdm
-from sklearn.metrics import confusion_matrix, classification_report
+import matplotlib
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('MacOSX')  # Use the MacOSX backend
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, jaccard_score, confusion_matrix, classification_report
+from sklearn.feature_extraction.text import CountVectorizer
+from tqdm import tqdm
+
+# Assuming the datasets directory is a sibling to the script location
+# and plots will be saved to a 'plots' directory also at the same level as the script
+datasets_dir = 'datasets'
+plots_dir = 'plots'
+
+# Use the MacOSX backend or adjust for a more generic backend compatible with all OS like 'Agg'
+matplotlib.use('MacOSX')  
+
+# Ensure plots directory exists 
+os.makedirs(plots_dir, exist_ok=True)
 
 
 # Load and process all the different datasets
@@ -48,14 +57,12 @@ def train_and_evaluate_model(train_data, test_data, dataset_name):
     validate_model_performance(y_test, y_pred, f"{dataset_name} - Validation Set")
     cm_validation = confusion_matrix(y_test, y_pred)
     plot_confusion_matrix(cm_validation, dataset_name, 'Validation Set')
-    # print_confusion_matrices(y_test, y_pred, f"{dataset_name} - Validation Set")
-
+    
     # Test set evaluation
     y_test_pred = clf.predict(test_features_df)
     validate_model_performance(test_labels, y_test_pred, f"{dataset_name} - Test Set")
     cm_test = confusion_matrix(test_labels, y_test_pred)
     plot_confusion_matrix(cm_test, dataset_name, 'Test Set')
-    #print_confusion_matrices(test_labels, y_test_pred, f"{dataset_name} - Test Set")
 
 # Function to create a classification report per data set
 def validate_model_performance(y_true, y_pred, dataset_name):
@@ -86,7 +93,8 @@ def plot_confusion_matrix(cm, dataset_name, dataset_type):
     plt.ylabel('Actual')
     plt.xlabel('Predicted')
     # Save the plot with dynamic filename
-    plt.savefig(f'/Users/juul/Desktop/MASTER/LoLa/{dataset_name}.png')
+    # and save plot to the 'plots' directory
+    plt.savefig(os.path.join(plots_dir, f'{dataset_name}-{dataset_type}.png')) 
     # Display plot
     plt.show(block=True)
     
@@ -118,23 +126,18 @@ def calculate_features(data):
         premise_word_count = len(premise_words)
         premise_overlap = overlap_count / premise_word_count if premise_word_count > 0 else 0
 
-        # Number of negation words in the premise
+        # List of common negation words
         neg_words = {"n't", 'no', 'not', 'nobody', 'not', 'nor', 'never', 'nothing', 'none'}
 
-        # Count negation words in premise and hypothesis
-        #neg_count_premise = len([t for t in data['p'].split() if t in neg_words])
-        #neg_count_hypothesis = len([t for t in data['h'].split() if t in neg_words])
-
+        # Count negation words in premise and hypothesis    
         neg_count_premise = sum(word in neg_words for word in premise_words)
         neg_count_hypothesis = sum(word in neg_words for word in hypothesis_words)
 
         # Calculate negation_xor feature
-
         if abs(neg_count_premise - neg_count_hypothesis) % 2 == 0:
             negation_xor = 0
         else:
             negation_xor = 1
-
 
         features.append({
             'overlap_count': overlap_count, 
@@ -162,13 +165,14 @@ def jaccard_similarity(list1, list2):
 def main():
     # List of all the directories to the different data sets to load 
     datasets = [
-        ('/Users/juul/Desktop/MASTER/LoLa/snli_train_data.json', '/Users/juul/Desktop/MASTER/LoLa/snli_test_data.json', 'Negation SNLI Data'),
-        ('/Users/juul/Desktop/MASTER/LoLa/mnli_train_data.json', '/Users/juul/Desktop/MASTER/LoLa/mnli_test_data.json', 'Negation MNLI Data'),
-        ('/Users/juul/Desktop/MASTER/LoLa/sick_train_data.json', '/Users/juul/Desktop/MASTER/LoLa/sick_test_data.json', 'Negation SICK Data'),
-        ('/Users/juul/Desktop/MASTER/LoLa/hans_train_data.json', '/Users/juul/Desktop/MASTER/LoLa/hans_test_data.json', 'Negation HANS Data'),
-        ('/Users/juul/Desktop/MASTER/LoLa/anli_train_data.json', '/Users/juul/Desktop/MASTER/LoLa/anli_test_data.json', 'Negation ANLI Data'),
-        ('/Users/juul/Desktop/MASTER/LoLa/wanli_train_data.json', '/Users/juul/Desktop/MASTER/LoLa/wanli_test_data.json', 'Negation WANLI Data')
-        ('/Users/juul/Desktop/MASTER/LoLa/fnli_train_data.json', '/Users/juul/Desktop/MASTER/LoLa/fnli_test_data.json', 'Negation FNLI Data')
+        # Replace 'your_train_dataset.json' and 'your_test_dataset.json' with the actual file path of your JSON dataset
+        ('your_train_dataset.json', 'your_test_dataset.json', 'Negation SNLI Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'Negation MNLI Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'Negation SICK Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'Negation HANS Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'Negation ANLI Data'),
+        ('your_train_dataset.json', 'your_test_dataset.json', 'Negation WANLI Data')
+        ('your_train_dataset.json', 'your_test_dataset.json', 'Negation FNLI Data')
     ]
 
     for train_path, test_path, dataset_name in datasets:
