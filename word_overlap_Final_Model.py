@@ -48,14 +48,14 @@ def train_and_evaluate_model(train_data, test_data, dataset_name):
     validate_model_performance(y_test, y_pred, f"{dataset_name} - Validation Set")
     cm_validation = confusion_matrix(y_test, y_pred)
     plot_confusion_matrix(cm_validation, dataset_name, 'Validation Set')
-    # print_confusion_matrices(y_test, y_pred, f"{dataset_name} - Validation Set")
+    
 
     # Test set evaluation
     y_test_pred = clf.predict(test_features_df)
     validate_model_performance(test_labels, y_test_pred, f"{dataset_name} - Test Set")
     cm_test = confusion_matrix(test_labels, y_test_pred)
     plot_confusion_matrix(cm_test, dataset_name, 'Test Set')
-    #print_confusion_matrices(test_labels, y_test_pred, f"{dataset_name} - Test Set")
+   
 
 # Function to create a classification report per data set
 def validate_model_performance(y_true, y_pred, dataset_name):
@@ -143,19 +143,23 @@ def jaccard_similarity(list1, list2):
 def main():
     # List of all the directories to the different data sets to load 
     datasets = [
-        # ('/Users/isabellewurth/Documents/Lola/preprocessed_train_data.json', '/Users/isabellewurth/Documents/Lola/preprocessed_test_data.json', 'SNLI Data'),
-        # ('/Users/isabellewurth/Documents/Lola/hans_data.json', '/Users/isabellewurth/Documents/Lola/hans_data.json', 'HANS Data'),
-        # ('/Users/isabellewurth/Documents/Lola/mnli_train_data.json', '/Users/isabellewurth/Documents/Lola/mnli_test_data.json', 'MNLI Data'),
-        # ('/Users/isabellewurth/Documents/Lola/sick_train_data.json', '/Users/isabellewurth/Documents/Lola/sick_test_data.json', 'SICK Data'),
+        ('/Users/isabellewurth/Documents/Lola/preprocessed_train_data.json', '/Users/isabellewurth/Documents/Lola/preprocessed_test_data.json', 'SNLI Data'),
+        ('/Users/isabellewurth/Documents/Lola/hans_data.json', '/Users/isabellewurth/Documents/Lola/hans_data.json', 'HANS Data'),
+        ('/Users/isabellewurth/Documents/Lola/mnli_train_data.json', '/Users/isabellewurth/Documents/Lola/mnli_test_data.json', 'MNLI Data'),
+        ('/Users/isabellewurth/Documents/Lola/sick_train_data.json', '/Users/isabellewurth/Documents/Lola/sick_test_data.json', 'SICK Data'),
         ('/Users/isabellewurth/Documents/Lola/anli_train_data.json', '/Users/isabellewurth/Documents/Lola/anli_test_data.json', 'ANLI Data')
         # Add other dataset paths
     ]
 
+    # Loop over each dataset specified in the datasets list to load and process train 
+    # and test data and perform the train_and_evaluate function
     for train_path, test_path, dataset_name in datasets:
+        # Print which dataset is currently being processed
         print(f"Processing {dataset_name}")
         train_data = load_and_process_dataset(train_path)
         test_data = load_and_process_dataset(test_path)
         train_and_evaluate_model(train_data, test_data, dataset_name)
 
+# Check if run as the main program
 if __name__ == "__main__":
     main()
